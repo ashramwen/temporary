@@ -15,6 +15,11 @@ converted=0
 skipped=0
 REPORT="$TARGET_DIR/size-report.md"
 
+if [[ -f "$REPORT" ]]; then
+  TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+  mv "$REPORT" "$TARGET_DIR/size-report_${TIMESTAMP}.md"
+fi
+
 {
   echo "# WebP Conversion Size Report"
   echo ""
