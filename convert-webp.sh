@@ -11,8 +11,9 @@ if [[ ! -d "$TARGET_DIR" ]]; then
   exit 1
 fi
 
+find "$TARGET_DIR" -type f -iname "*.webp" -delete
+
 converted=0
-skipped=0
 REPORT="$TARGET_DIR/size-report.md"
 
 if [[ -f "$REPORT" ]]; then
@@ -33,23 +34,16 @@ total_webp=0
 while IFS= read -r src; do
   out="${src%.*}.webp"
 
-  if [[ ! -f "$out" ]]; then
-    ext=$(echo "${src##*.}" | tr '[:upper:]' '[:lower:]')
-    if [[ "$ext" == "gif" ]]; then
-      gif2webp -quiet -q "$QUALITY_GIF" "$src" -o "$out"
-      quality=$QUALITY_GIF
-    else
-      cwebp -quiet -q "$QUALITY_IMAGE" "$src" -o "$out"
-      quality=$QUALITY_IMAGE
-    fi
-    echo "done  $src -> $out"
-    converted=$((converted + 1))
+  ext=$(echo "${src##*.}" | tr '[:upper:]' '[:lower:]')
+  if [[ "$ext" == "gif" ]]; then
+    gif2webp -quiet -q "$QUALITY_GIF" "$src" -o "$out"
+    quality=$QUALITY_GIF
   else
-    echo "skip  $src"
-    skipped=$((skipped + 1))
-    ext=$(echo "${src##*.}" | tr '[:upper:]' '[:lower:]')
-    if [[ "$ext" == "gif" ]]; then quality=$QUALITY_GIF; else quality=$QUALITY_IMAGE; fi
+    cwebp -quiet -q "$QUALITY_IMAGE" "$src" -o "$out"
+    quality=$QUALITY_IMAGE
   fi
+  echo "done  $src -> $out"
+  converted=$((converted + 1))
 
   orig_size=$(stat -f%z "$src")
   webp_size=$(stat -f%z "$out")
@@ -90,5 +84,5 @@ fmt_total() {
 } >> "$REPORT"
 
 echo ""
-echo "converted: $converted  skipped: $skipped"
+echo "converted: $converted"
 echo "report:    $REPORT"
