@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+QUALITY_IMAGE=75
+QUALITY_GIF=80
+
 TARGET_DIR="${1:-hy-5085}"
 
 if [[ ! -d "$TARGET_DIR" ]]; then
@@ -28,11 +31,11 @@ while IFS= read -r src; do
   if [[ ! -f "$out" ]]; then
     ext=$(echo "${src##*.}" | tr '[:upper:]' '[:lower:]')
     if [[ "$ext" == "gif" ]]; then
-      gif2webp -quiet "$src" -o "$out"
-      quality=80
+      gif2webp -quiet -q "$QUALITY_GIF" "$src" -o "$out"
+      quality=$QUALITY_GIF
     else
-      cwebp -quiet "$src" -o "$out"
-      quality=75
+      cwebp -quiet -q "$QUALITY_IMAGE" "$src" -o "$out"
+      quality=$QUALITY_IMAGE
     fi
     echo "done  $src -> $out"
     converted=$((converted + 1))
@@ -40,7 +43,7 @@ while IFS= read -r src; do
     echo "skip  $src"
     skipped=$((skipped + 1))
     ext=$(echo "${src##*.}" | tr '[:upper:]' '[:lower:]')
-    if [[ "$ext" == "gif" ]]; then quality=80; else quality=75; fi
+    if [[ "$ext" == "gif" ]]; then quality=$QUALITY_GIF; else quality=$QUALITY_IMAGE; fi
   fi
 
   orig_size=$(stat -f%z "$src")
