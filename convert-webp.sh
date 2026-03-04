@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-QUALITY_IMAGE=85
-QUALITY_GIF=90
+QUALITY_IMAGE=95
+QUALITY_GIF=95
 
 TARGET_DIR="${1:-hy-5085}"
 
